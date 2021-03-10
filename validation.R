@@ -1,7 +1,6 @@
-library(dplyr)
-library(tidyr)
+library(tidyverse)
 library(bertens)
-library(stringr)
+library(pROC)
 
 eclipse.raw <- read_csv("eclipse.csv") %>% filter (VISIT == "2 Years") %>% select (id = SUBJECT_ID, Age = AGE, sex = SEX, 
                                                fev1 = FEV1PSPC) %>%
@@ -30,7 +29,8 @@ exacerbation <- read_csv("exacerbation.csv") %>% select(id= SUBJECT_ID,
                select (id, year1, year2to3)
 
 
-
+# the paper defines A history of vascular disease was defined as stroke, transient ischemic attack, or peripheral arterial disease.
+# we used strokeHx | heartAttackHx as a proxy for it in ECLIPSE.
 eclipse <- eclipse.raw %>% left_join(cv_cond, by = "id") %>% left_join(packyear, by = "id") %>%
                            mutate(strokeHx  = recode (strokeHx,
                                                       "Y" = "TRUE",
@@ -49,5 +49,8 @@ eclipse <- eclipse.raw %>% left_join(cv_cond, by = "id") %>% left_join(packyear,
                                            fev1=fev1, 
                                            packYears = packyears,
                                            vascularDx = vascularDx))
-                           
+ 
+bertensROC <- roc(predictor=eclipse$predictedBertens, response = eclipse$year2to3,
+    plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
   
+ggroc (bertensROC)
