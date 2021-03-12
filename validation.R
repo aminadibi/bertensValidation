@@ -1,13 +1,14 @@
 library(tidyverse)
 library(bertens)
 library(pROC)
-
+library(gbm)
+library(rmda)
 eclipse.raw <- read_csv("eclipse.csv") %>% filter (VISIT == "2 Years") %>% select (id = SUBJECT_ID, Age = AGE, sex = SEX, 
                                                fev1 = FEV1PSPC) %>%
                                        mutate(id = str_remove(id, "xyl"))
 
 
-# better cardiovasuclar data also available.
+# better cardiovascular data also available.
 
 packyear <- read_table2("packyear.txt") %>% select (id = SUBJECT_ID, packyears = SUPKYR) %>%
                                             mutate(id = str_remove(id, "ecl"))
@@ -20,9 +21,9 @@ cv_cond <- read_csv("cv_cond.csv") %>% select (id= SUBJECT_ID,
 
 exacerbation <- read_csv("exacerbation.csv") %>% select(id= SUBJECT_ID, 
                                                         year = YRCAT,
-                                                        exacCount = EXACNUM1) %>%
+                                                        moderateSevereExacCount = EXACNUM1) %>%
                                                         #followup = OBSTIME) %>%
-               pivot_wider(names_from = year, values_from = exacCount) %>%
+               pivot_wider(names_from = year, values_from = moderateSevereExacCount) %>%
                mutate(year1 = `Year 1`,
                       year2to3 = `Years 1-3` - year1,
                       id = str_remove(id, "xyl")) %>%
@@ -44,13 +45,27 @@ eclipse <- eclipse.raw %>% left_join(cv_cond, by = "id") %>% left_join(packyear,
                                   vascularDx = (strokeHx | heartAttackHx)) %>%
                           select(-strokeHx, -heartAttackHx) %>%
                           left_join(exacerbation, by = "id") %>%
+                        #  filter(packyears > 0) %>%
                           mutate(predictedBertens = 
                                    bertens(exacerbationHx = year1, 
                                            fev1=fev1, 
                                            packYears = packyears,
-                                           vascularDx = vascularDx))
- 
-bertensROC <- roc(predictor=eclipse$predictedBertens, response = eclipse$year2to3,
+                                           vascularDx = vascularDx)) %>%
+
+                        mutate(hadExac = ifelse(year2to3>0, 1, 0))
+
+eclipseComplete <- eclipse %>% drop_na()  %>% filter (predictedBertens != 0)
+#second filteration is temporary till we figure out the logistics issue.
+
+
+roc(predictor=eclipseComplete$predictedBertens, response = eclipseComplete$hadExac,
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
   
-ggroc (bertensROC)
+
+
+calibrate.plot(y = eclipseComplete$hadExac, p = eclipseComplete$predictedBertens)
+
+dc <- decision_curve(hadExac ~ predictedBertens, data = eclipseComplete)
+plot_decision_curve(dc)
+
+write.csv(eclipse, "eclipse_bertens.csv")
