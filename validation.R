@@ -46,7 +46,7 @@ eclipse <- eclipse.raw %>% left_join(cv_cond, by = "id") %>% left_join(packyear,
                           select(-strokeHx, -heartAttackHx) %>%
                           left_join(exacerbation, by = "id") %>%
                         #  filter(packyears > 0) %>%
-                          mutate(hadExac = ifelse(year2to3>0, 1, 0))  %>%
+                          mutate(Observed_Exac_in2to3 = ifelse(year2to3>0, 1, 0))  %>%
                           mutate(predictedBertens = 
                                    bertens(exacerbationHx = (year1>0), 
                                            fev1=fev1, 
@@ -57,18 +57,18 @@ eclipseComplete <- eclipse %>% drop_na()  %>% filter (predictedBertens != 0)
 #second filteration is temporary till we figure out the logistics issue.
 
 
-roc(predictor=eclipseComplete$predictedBertens, response = eclipseComplete$hadExac,
+roc(predictor=eclipseComplete$predictedBertens, response = eclipseComplete$Observed_Exac_in2to3,
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
   
 
 
-calibrate.plot(y = eclipseComplete$hadExac, p = eclipseComplete$predictedBertens)
+calibrate.plot(y = eclipseComplete$Observed_Exac_in2to3, p = eclipseComplete$predictedBertens)
 
-dc_bertens <- decision_curve(hadExac ~ predictedBertens, data = eclipseComplete)
-dc_history <- decision_curve(hadExac ~ (year1>0), data = eclipseComplete)
+dc_bertens <- decision_curve(Observed_Exac_in2to3 ~ predictedBertens, data = eclipseComplete)
+dc_history <- decision_curve(Observed_Exac_in2to3 ~ (year1>0), data = eclipseComplete)
 plot_decision_curve(list(dc_bertens, dc_history),
                     curve.names = c("Bertens Model", "Exacerbation History"),
                     confidence.intervals = FALSE,  #remove confidence intervals
-                    cost.benefit.axis = FALSE, #remove cost benefit axis)
+                    cost.benefit.axis = FALSE) #remove cost benefit axis)
 
 write.csv(eclipse, "eclipse_bertens.csv")
