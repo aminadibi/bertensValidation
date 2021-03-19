@@ -25,9 +25,10 @@ exacerbation <- read_csv("exacerbation.csv") %>% select(id= SUBJECT_ID,
                                                         #followup = OBSTIME) %>%
                pivot_wider(names_from = year, values_from = moderateSevereExacCount) %>%
                mutate(year1 = `Year 1`,
+                      year2 = `Year 2`,
                       year2to3 = `Years 1-3` - year1,
                       id = str_remove(id, "xyl")) %>%
-               select (id, year1, year2to3)
+               select (id, year1, year2, year2to3)
 
 
 # the paper defines A history of vascular disease was defined as stroke, transient ischemic attack, or peripheral arterial disease.
@@ -47,28 +48,54 @@ eclipse <- eclipse.raw %>% left_join(cv_cond, by = "id") %>% left_join(packyear,
                           left_join(exacerbation, by = "id") %>%
                         #  filter(packyears > 0) %>%
                           mutate(Observed_Exac_in2to3 = ifelse(year2to3>0, 1, 0))  %>%
-                          mutate(predictedBertens = 
-                                   bertens(exacerbationHx = (year1>0), 
+                          mutate(Observed_Exac_in2 = ifelse(year2>0, 1, 0))  %>%
+                          mutate(year1ExacHx = ifelse(year1>0, 1, 0),
+                                 predictedBertens = 
+                                   bertens(exacerbationHx = year1ExacHx, 
                                            fev1=fev1, 
                                            packYears = packyears,
-                                           vascularDx = vascularDx)) 
+                                           vascularDx = vascularDx),
+                                 predictedBertens1Yr = 1-sqrt(1-predictedBertens)) 
 
-eclipseComplete <- eclipse %>% drop_na()  %>% filter (predictedBertens != 0)
-#second filteration is temporary till we figure out the logistics issue.
+eclipseComplete <- eclipse %>% drop_na()
 
-
+# for two year prediction
 roc(predictor=eclipseComplete$predictedBertens, response = eclipseComplete$Observed_Exac_in2to3,
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
-  
+ 
+#history alone for two years
+roc(predictor=eclipseComplete$year1ExacHx, response = eclipseComplete$Observed_Exac_in2to3,
+    plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
+
+# for 1 year prediction
+roc(predictor=eclipseComplete$predictedBertens1Yr, response = eclipseComplete$Observed_Exac_in2,
+    plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
+
+#history alone for 1 year
+roc(predictor=eclipseComplete$year1ExacHx, response = eclipseComplete$Observed_Exac_in2,
+    plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
 
 
+# for two year outcome
 calibrate.plot(y = eclipseComplete$Observed_Exac_in2to3, p = eclipseComplete$predictedBertens)
 
-dc_bertens <- decision_curve(Observed_Exac_in2to3 ~ predictedBertens, data = eclipseComplete)
-dc_history <- decision_curve(Observed_Exac_in2to3 ~ (year1>0), data = eclipseComplete)
-plot_decision_curve(list(dc_bertens, dc_history),
+# for one year outcome
+calibrate.plot(y = eclipseComplete$Observed_Exac_in2, p = eclipseComplete$predictedBertens1Yr)
+
+
+dc_bertens_2yrs <- decision_curve(Observed_Exac_in2to3 ~ predictedBertens, data = eclipseComplete)
+dc_history_2yrs <- decision_curve(Observed_Exac_in2to3 ~ year1ExacHx, data = eclipseComplete)
+plot_decision_curve(list(dc_bertens_2yrs, dc_history_2yrs),
                     curve.names = c("Bertens Model", "Exacerbation History"),
                     confidence.intervals = FALSE,  #remove confidence intervals
                     cost.benefit.axis = FALSE) #remove cost benefit axis)
+
+dc_bertens_1yr <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data = eclipseComplete)
+dc_history_1yr <- decision_curve(Observed_Exac_in2 ~ year1ExacHx, data = eclipseComplete)
+plot_decision_curve(list(dc_bertens_1yr, dc_history_1yr),
+                    curve.names = c("Bertens 1Yr", "Exacerbation History"),
+                    confidence.intervals = FALSE,  #remove confidence intervals
+                    cost.benefit.axis = FALSE) #remove cost benefit axis)
+
 
 write.csv(eclipse, "eclipse_bertens.csv")
