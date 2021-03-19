@@ -46,13 +46,12 @@ eclipse <- eclipse.raw %>% left_join(cv_cond, by = "id") %>% left_join(packyear,
                           select(-strokeHx, -heartAttackHx) %>%
                           left_join(exacerbation, by = "id") %>%
                         #  filter(packyears > 0) %>%
+                          mutate(hadExac = ifelse(year2to3>0, 1, 0))  %>%
                           mutate(predictedBertens = 
-                                   bertens(exacerbationHx = year1, 
+                                   bertens(exacerbationHx = (year1>0), 
                                            fev1=fev1, 
                                            packYears = packyears,
-                                           vascularDx = vascularDx)) %>%
-
-                        mutate(hadExac = ifelse(year2to3>0, 1, 0))
+                                           vascularDx = vascularDx)) 
 
 eclipseComplete <- eclipse %>% drop_na()  %>% filter (predictedBertens != 0)
 #second filteration is temporary till we figure out the logistics issue.
@@ -65,7 +64,11 @@ roc(predictor=eclipseComplete$predictedBertens, response = eclipseComplete$hadEx
 
 calibrate.plot(y = eclipseComplete$hadExac, p = eclipseComplete$predictedBertens)
 
-dc <- decision_curve(hadExac ~ predictedBertens, data = eclipseComplete)
-plot_decision_curve(dc)
+dc_bertens <- decision_curve(hadExac ~ predictedBertens, data = eclipseComplete)
+dc_history <- decision_curve(hadExac ~ (year1>0), data = eclipseComplete)
+plot_decision_curve(list(dc_bertens, dc_history),
+                    curve.names = c("Bertens Model", "Exacerbation History"),
+                    confidence.intervals = FALSE,  #remove confidence intervals
+                    cost.benefit.axis = FALSE, #remove cost benefit axis)
 
 write.csv(eclipse, "eclipse_bertens.csv")
