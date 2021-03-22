@@ -97,6 +97,24 @@ plot_decision_curve(list(dc_bertens_2yrs, dc_history_2yrs),
                     confidence.intervals = FALSE,  #remove confidence intervals
                     cost.benefit.axis = FALSE) #remove cost benefit axis)
 
+dc_bertens_2yrsSmokers <- decision_curve(Observed_Exac_in2to3 ~ predictedBertens, data = eclipseCompleteSmokers)
+dc_history_2yrsSmokers <- decision_curve(Observed_Exac_in2to3 ~ year1ExacHx, data = eclipseCompleteSmokers)
+plot_decision_curve(list(dc_bertens_2yrsSmokers, dc_history_2yrsSmokers),
+                    curve.names = c("Bertens Model Smokers", "Exacerbation History Smokers"),
+                    confidence.intervals = FALSE,  #remove confidence intervals
+                    cost.benefit.axis = FALSE) #remove cost benefit axis)
+
+# Harry's Version
+harry <- read_csv("./eclipse_bertens_harry.csv") %>% filter(predictedBertens > 0) %>%drop_na() %>% 
+         mutate (hadHistory = ifelse (year1>0, 1, 0))
+dc_bertens_2yrsSmokers_harry <- decision_curve(hadExac ~ predictedBertens, data = harry)
+dc_history_2yrsSmokers_harry <- decision_curve(hadExac ~ hadHistory, data = harry )
+plot_decision_curve(list(dc_bertens_2yrsSmokers_harry, dc_history_2yrsSmokers_harry),
+                    curve.names = c("Bertens Model Smokers_harry", "Exacerbation History Smokers_harry"),
+                    confidence.intervals = FALSE,  #remove confidence intervals
+                    cost.benefit.axis = FALSE) #remove cost benefit axis)
+
+ 
 dc_bertens_1yr <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data = eclipseComplete)
 dc_history_1yr <- decision_curve(Observed_Exac_in2 ~ year1ExacHx, data = eclipseComplete)
 plot_decision_curve(list(dc_bertens_1yr, dc_history_1yr),
@@ -120,9 +138,30 @@ write.csv(eclipse, "eclipse_bertens.csv")
 
 externalResults$hadSevereExac <-ifelse(externalResults$observedSevereExacCount>0, 1, 0)
 
-dc_accept <- decision_curve(hadSevereExac ~ predicted_severe_exac_rate, data = externalResults)
-dc_history_accept <- decision_curve(hadSevereExac ~ obsExac_yr2, data = externalResults)
-plot_decision_curve(list(dc_accept, dc_history_accept),
+dc_accept_sev <- decision_curve(hadSevereExac ~ predicted_severe_exac_probability_oldMethod, data = externalResults)
+dc_history_accept_sev <- decision_curve(hadSevereExac ~ obsExac_yr1, data = externalResults)
+plot_decision_curve(list(dc_accept_sev, dc_history_accept_sev),
                     curve.names = c("ACCEPT Severe", "Exacerbation History - Severe"),
+                    confidence.intervals = FALSE,  #remove confidence intervals
+                    cost.benefit.axis = FALSE) #remove cost benefit axis)
+
+
+externalResults$hadExac <-ifelse(externalResults$observedExacCount>0, 1, 0)
+
+dc_accept <- decision_curve(hadExac ~ predicted_exac_probability, data = externalResults)
+dc_history_accept <- decision_curve(hadExac ~ obsExac_yr1, data = externalResults)
+plot_decision_curve(list(dc_accept, dc_history_accept),
+                    curve.names = c("ACCEPT", "Exacerbation History "),
+                    confidence.intervals = FALSE,  #remove confidence intervals
+                    cost.benefit.axis = FALSE) #remove cost benefit axis)
+
+
+
+externalResults$hadExac2 <-ifelse(externalResults$observedExacCount>1, 1, 0)
+
+dc_accept <- decision_curve(hadExac2 ~ predicted_exac_probability, data = externalResults)
+dc_history_accept <- decision_curve(hadExac2 ~ obsExac_yr1, data = externalResults)
+plot_decision_curve(list(dc_accept, dc_history_accept),
+                    curve.names = c("ACCEPT 2 or more", "Exacerbation History - 2 or more"),
                     confidence.intervals = FALSE,  #remove confidence intervals
                     cost.benefit.axis = FALSE) #remove cost benefit axis)
