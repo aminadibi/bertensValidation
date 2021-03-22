@@ -59,7 +59,7 @@ eclipse <- eclipse.raw %>% left_join(cv_cond, by = "id") %>% left_join(packyear,
 
 eclipseComplete <- eclipse %>% drop_na()
 
-eclipseCompleteSmokers %>% eclipseComplete %>% filter (packyears>=1)
+eclipseCompleteSmokers <- eclipseComplete %>% filter (packyears>=1)
 
 # for two year prediction
 roc(predictor=eclipseComplete$predictedBertens, response = eclipseComplete$Observed_Exac_in2to3,
@@ -114,3 +114,15 @@ plot_decision_curve(list(dc_bertens_1yrSmokers, dc_history_1yrSmokers),
 
 
 write.csv(eclipse, "eclipse_bertens.csv")
+
+
+## ACCEPT
+
+externalResults$hadSevereExac <-ifelse(externalResults$observedSevereExacCount>0, 1, 0)
+
+dc_accept <- decision_curve(hadSevereExac ~ predicted_severe_exac_rate, data = externalResults)
+dc_history_accept <- decision_curve(hadSevereExac ~ obsExac_yr2, data = externalResults)
+plot_decision_curve(list(dc_accept, dc_history_accept),
+                    curve.names = c("ACCEPT Severe", "Exacerbation History - Severe"),
+                    confidence.intervals = FALSE,  #remove confidence intervals
+                    cost.benefit.axis = FALSE) #remove cost benefit axis)
