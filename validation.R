@@ -59,7 +59,7 @@ eclipse <- eclipse.raw %>% left_join(cv_cond, by = "id") %>% left_join(packyear,
 
 eclipseComplete <- eclipse %>% drop_na()
 
-eclipseCompleteSmokers %>% filter (packyears>=1)
+eclipseCompleteSmokers %>% eclipseComplete %>% filter (packyears>=1)
 
 # for two year prediction
 roc(predictor=eclipseComplete$predictedBertens, response = eclipseComplete$Observed_Exac_in2to3,
