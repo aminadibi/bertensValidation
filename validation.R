@@ -59,6 +59,8 @@ eclipse <- eclipse.raw %>% left_join(cv_cond, by = "id") %>% left_join(packyear,
 
 eclipseComplete <- eclipse %>% drop_na()
 
+eclipseCompleteNonSmokers %>% filter (packyears>=1)
+
 # for two year prediction
 roc(predictor=eclipseComplete$predictedBertens, response = eclipseComplete$Observed_Exac_in2to3,
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
@@ -70,6 +72,11 @@ roc(predictor=eclipseComplete$year1ExacHx, response = eclipseComplete$Observed_E
 # for 1 year prediction
 roc(predictor=eclipseComplete$predictedBertens1Yr, response = eclipseComplete$Observed_Exac_in2,
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
+
+# for 1 year smokers only prediction 
+roc(predictor=eclipseCompleteNonSmokers$predictedBertens1Yr, response = eclipseCompleteNonSmokers$Observed_Exac_in2,
+    plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
+
 
 #history alone for 1 year
 roc(predictor=eclipseComplete$year1ExacHx, response = eclipseComplete$Observed_Exac_in2,
@@ -94,6 +101,14 @@ dc_bertens_1yr <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data =
 dc_history_1yr <- decision_curve(Observed_Exac_in2 ~ year1ExacHx, data = eclipseComplete)
 plot_decision_curve(list(dc_bertens_1yr, dc_history_1yr),
                     curve.names = c("Bertens 1Yr", "Exacerbation History"),
+                    confidence.intervals = FALSE,  #remove confidence intervals
+                    cost.benefit.axis = FALSE) #remove cost benefit axis)
+
+# one year nonsmokers
+dc_bertens_1yrNonSmokers <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data = eclipseCompleteNonSmokers)
+dc_history_1yrNonSmokers <- decision_curve(Observed_Exac_in2 ~ year1ExacHx, data = eclipseCompleteNonSmokers)
+plot_decision_curve(list(dc_bertens_1yrNonSmokers, dc_history_1yrNonSmokers),
+                    curve.names = c("Bertens 1Yr NonSmokers", "Exacerbation History NonSmokers"),
                     confidence.intervals = FALSE,  #remove confidence intervals
                     cost.benefit.axis = FALSE) #remove cost benefit axis)
 
