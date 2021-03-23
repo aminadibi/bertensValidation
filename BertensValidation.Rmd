@@ -3,8 +3,8 @@ title: "Bertens Validation"
 author: "Amin Adibi"
 date: "23/03/2021"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -21,10 +21,11 @@ library(gbm)
 library(rmda)
 library(ggthemes)
 library(naniar)
-eclipse.raw <- read_csv("eclipse.csv") %>% filter (VISIT == "1 Year") %>% select (id = SUBJECT_ID, Age = AGE, sex = SEX, 
-                                               fev1 = FEV1PSPC) %>%
-                                       mutate(id = str_remove(id, "xyl"))
-
+eclipse.raw <- read_csv("eclipse.csv") %>% 
+  filter (VISIT == "1 Year") %>% 
+  select (id = SUBJECT_ID, Age = AGE, sex = SEX, 
+          fev1 = FEV1PSPC) %>%
+          mutate(id = str_remove(id, "xyl"))
 
 # better cardiovascular data also available.
 
@@ -68,9 +69,10 @@ eclipse <- eclipse.raw %>% filter (fev1<85) %>%  # removing non-copd controls
                         #  filter(packyears > 0) %>%
                           mutate(Observed_Exac_in2to3 = ifelse(year2to3>0, 1, 0))  %>%
                           mutate(Observed_Exac_in2 = ifelse(year2>0, 1, 0))  %>%
-                          mutate(year1ExacHx = ifelse(year1>0, 1, 0),
+                          mutate(year1FreqExacerbator = ifelse(year1>1, 1, 0),
+                                 year1HadExac = ifelse(year1>0, 1, 0),
                                  predictedBertens = 
-                                   bertens(exacerbationHx = year1ExacHx, 
+                                   bertens(exacerbationHx = year1HadExac, 
                                            fev1=fev1, 
                                            packYears = packyears,
                                            vascularDx = vascularDx),
@@ -99,14 +101,14 @@ roc(predictor=eclipseComplete$predictedBertens, response = eclipseComplete$Obser
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)  
 
 #history alone for two years
-roc(predictor=eclipseComplete$year1ExacHx, response = eclipseComplete$Observed_Exac_in2to3,
+roc(predictor=eclipseComplete$year1FreqExacerbator, response = eclipseComplete$Observed_Exac_in2to3,
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)     
 # for two year outcome
 calibrate.plot(y = eclipseComplete$Observed_Exac_in2to3, p = eclipseComplete$predictedBertens)
 
 
 dc_bertens_2yrs <- decision_curve(Observed_Exac_in2to3 ~ predictedBertens, data = eclipseComplete)
-dc_history_2yrs <- decision_curve(Observed_Exac_in2to3 ~ year1ExacHx, data = eclipseComplete)
+dc_history_2yrs <- decision_curve(Observed_Exac_in2to3 ~ year1FreqExacerbator, data = eclipseComplete)
 plot_decision_curve(list(dc_bertens_2yrs, dc_history_2yrs),
                     curve.names = c("Bertens Model", "Exacerbation History"),
                     confidence.intervals = FALSE,  #remove confidence intervals
@@ -122,7 +124,7 @@ plot_decision_curve(list(dc_bertens_2yrs, dc_history_2yrs),
 BertensROCSmokers2Yrs <- roc(predictor=eclipseCompleteSmokers$predictedBertens, response = eclipseCompleteSmokers$Observed_Exac_in2to3,
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
 
-HistoryROCSmokers2Yrs <- roc(predictor=eclipseCompleteSmokers$year1ExacHx, response = eclipseCompleteSmokers$Observed_Exac_in2to3,
+HistoryROCSmokers2Yrs <- roc(predictor=eclipseCompleteSmokers$year1FreqExacerbator, response = eclipseCompleteSmokers$Observed_Exac_in2to3,
                              plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
 
 Rocs <- list (Bertens = BertensROCSmokers2Yrs , History = HistoryROCSmokers2Yrs)
@@ -136,7 +138,7 @@ calibrate.plot(y = eclipseCompleteSmokers$Observed_Exac_in2to3, p = eclipseCompl
 
 
 dc_bertens_2yrsSmokers <- decision_curve(Observed_Exac_in2to3 ~ predictedBertens, data = eclipseCompleteSmokers)
-dc_history_2yrsSmokers <- decision_curve(Observed_Exac_in2to3 ~ year1ExacHx, data = eclipseCompleteSmokers)
+dc_history_2yrsSmokers <- decision_curve(Observed_Exac_in2to3 ~ year1FreqExacerbator, data = eclipseCompleteSmokers)
 plot_decision_curve(list(dc_bertens_2yrsSmokers, dc_history_2yrsSmokers),
                     curve.names = c("Bertens Model Smokers", "Exacerbation History Smokers"),
                     confidence.intervals = FALSE,  #remove confidence intervals
@@ -158,7 +160,7 @@ roc(predictor=eclipseCompleteSmokers$predictedBertens1Yr, response = eclipseComp
 
 
 #history alone for 1 year
-roc(predictor=eclipseComplete$year1ExacHx, response = eclipseComplete$Observed_Exac_in2,
+roc(predictor=eclipseComplete$year1FreqExacerbator, response = eclipseComplete$Observed_Exac_in2,
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
 
 
@@ -166,7 +168,7 @@ roc(predictor=eclipseComplete$year1ExacHx, response = eclipseComplete$Observed_E
 calibrate.plot(y = eclipseComplete$Observed_Exac_in2, p = eclipseComplete$predictedBertens1Yr)
 
 dc_bertens_1yr <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data = eclipseComplete)
-dc_history_1yr <- decision_curve(Observed_Exac_in2 ~ year1ExacHx, data = eclipseComplete)
+dc_history_1yr <- decision_curve(Observed_Exac_in2 ~ year1FreqExacerbator, data = eclipseComplete)
 plot_decision_curve(list(dc_bertens_1yr, dc_history_1yr),
                     curve.names = c("Bertens 1Yr", "Exacerbation History"),
                     confidence.intervals = FALSE,  #remove confidence intervals
@@ -174,7 +176,7 @@ plot_decision_curve(list(dc_bertens_1yr, dc_history_1yr),
 
 # one year Smokers
 dc_bertens_1yrSmokers <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data = eclipseCompleteSmokers)
-dc_history_1yrSmokers <- decision_curve(Observed_Exac_in2 ~ year1ExacHx, data = eclipseCompleteSmokers)
+dc_history_1yrSmokers <- decision_curve(Observed_Exac_in2 ~ year1FreqExacerbator, data = eclipseCompleteSmokers)
 plot_decision_curve(list(dc_bertens_1yrSmokers, dc_history_1yrSmokers),
                     curve.names = c("Bertens 1Yr Smokers", "Exacerbation History Smokers"),
                     confidence.intervals = FALSE,  #remove confidence intervals
@@ -190,15 +192,18 @@ plot_decision_curve(list(dc_bertens_1yrSmokers, dc_history_1yrSmokers),
 
 
 ## ACCEPT
-#externalResults <- readRDS("externalResultswithHx.rds")
-externalResults <- readRDS("externalResultsAllHx.rds")
-externalResults$hadSevereExac <-ifelse(externalResults$observedSevereExacCount>0, 1, 0)
+#eclipseACCEPT <- readRDS("externalResultswithHx.rds")
+eclipseACCEPT <- readRDS("externalResultsAllHx.rds") %>% 
+  mutate(year1FreqExacerbator = ifelse(((obsExac_yr1>1) | (obsExac_severe_yr1>0)), 1, 0),
+         hadSevereExac = ifelse(observedSevereExacCount>0, 1, 0),
+         hadExac = ifelse(observedExacCount>0, 1, 0))
 
-
-AcceptROCSev <- roc(predictor=externalResults$predicted_severe_exac_probability_oldMethod, response = externalResults$hadSevereExac,
+AcceptROCSev <- roc(predictor=eclipseACCEPT$predicted_severe_exac_probability_oldMethod, 
+                    response = eclipseACCEPT$hadSevereExac,
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
 
-HistoryROCSev <- roc(predictor=externalResults$obsExac_yr1, response = externalResults$hadSevereExac,
+HistoryROCSev <- roc(predictor=eclipseACCEPT$year1FreqExacerbator, 
+                     response = eclipseACCEPT$hadSevereExac,
                              plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
 
 AcceptRocsSev <- list (acceptSev = AcceptROCSev , History = HistoryROCSev)
@@ -207,11 +212,12 @@ ggroc (AcceptRocsSev, size = 1)  + theme_bw(base_size = 14) +
     ylab("Sensitivity") + labs(caption="For Severe Exacerbations")
 
 
-calibrate.plot(y = externalResults$hadSevereExac, p = externalResults$predicted_severe_exac_probability_oldMethod)
+calibrate.plot(y = eclipseACCEPT$hadSevereExac, p = eclipseACCEPT$predicted_severe_exac_probability_oldMethod)
 
 
-dc_accept_sev <- decision_curve(hadSevereExac ~ predicted_severe_exac_probability_oldMethod, data = externalResults)
-dc_history_accept_sev <- decision_curve(hadSevereExac ~ obsExac_yr1, data = externalResults)
+dc_accept_sev <- decision_curve(hadSevereExac ~ predicted_severe_exac_probability_oldMethod, 
+                                data = eclipseACCEPT)
+dc_history_accept_sev <- decision_curve(hadSevereExac ~ year1FreqExacerbator, data = eclipseACCEPT)
 plot_decision_curve(list(dc_accept_sev, dc_history_accept_sev),
                     curve.names = c("ACCEPT Severe", "Exacerbation History - Severe"),
                     confidence.intervals = FALSE,  #remove confidence intervals
@@ -222,10 +228,12 @@ plot_decision_curve(list(dc_accept_sev, dc_history_accept_sev),
 
 ```{r acceptModSev, echo=FALSE, cache=TRUE}
 
-AcceptROC <- roc(predictor=externalResults$predicted_exac_probability, response = externalResults$hadExac,
+AcceptROC <- roc(predictor=eclipseACCEPT$predicted_exac_probability, 
+                 response = eclipseACCEPT$hadExac,
     plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
 
-HistoryROC <- roc(predictor=externalResults$obsExac_yr1, response = externalResults$hadExac,
+HistoryROC <- roc(predictor=eclipseACCEPT$year1FreqExacerbator, 
+                  response = eclipseACCEPT$hadExac,
                              plot = T, ci=T, print.auc=TRUE,  boot.n=1000, ci.alpha=0.95, stratified=FALSE, show.thres=TRUE, grid=TRUE)                          
 
 AcceptRocs <- list (accept = AcceptROC , History = HistoryROC)
@@ -233,15 +241,13 @@ ggroc (AcceptRocs, size = 1)  + theme_bw(base_size = 14) +
     theme(legend.title = element_blank()) + xlab ("Specificity") + 
     ylab("Sensitivity") + labs(caption="For Moderate and Severe Exacerbations")
 
+calibrate.plot(y = eclipseACCEPT$hadExac, p = eclipseACCEPT$predicted_exac_probability)
 
 
-externalResults$hadExac <-ifelse(externalResults$observedExacCount>0, 1, 0)
-
-calibrate.plot(y = externalResults$hadExac, p = externalResults$predicted_exac_probability)
-
-
-dc_accept <- decision_curve(hadExac ~ predicted_exac_probability, data = externalResults)
-dc_history_accept <- decision_curve(hadExac ~ obsExac_yr1, data = externalResults)
+dc_accept <- decision_curve(hadExac ~ predicted_exac_probability, 
+                            data = eclipseACCEPT)
+dc_history_accept <- decision_curve(hadExac ~ year1FreqExacerbator, 
+                                    data = eclipseACCEPT)
 plot_decision_curve(list(dc_accept, dc_history_accept),
                     curve.names = c("ACCEPT", "Exacerbation History "),
                     confidence.intervals = FALSE,  #remove confidence intervals
