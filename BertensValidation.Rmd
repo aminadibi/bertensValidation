@@ -40,14 +40,16 @@ cv_cond <- read_csv("cv_cond.csv") %>% select (id= SUBJECT_ID,
 
 exacerbation <- read_csv("exacerbation.csv") %>% select(id= SUBJECT_ID, 
                                                         year = YRCAT,
-                                                        moderateSevereExacCount = EXACNUM1) %>%
+                                                        modSevereExac = EXACNUM1,
+                                                        sevExac = SEVEXN1) %>%
                                                         #followup = OBSTIME) %>%
-               pivot_wider(names_from = year, values_from = moderateSevereExacCount) %>%
-               mutate(year1 = `Year 1`,
-                      year2 = `Year 2`,
-                      year2to3 = `Years 1-3` - year1,
+               pivot_wider(names_from = year, values_from = c(modSevereExac, sevExac)) %>%
+               mutate(year1 = `modSevereExac_Year 1`,
+                      year2 = `modSevereExac_Year 2`,
+                      year2to3 = `modSevereExac_Years 1-3` - year1,
+                      year1Sev = `sevExac_Year 1`,
                       id = str_remove(id, "xyl")) %>%
-               select (id, year1, year2, year2to3)
+               select (id, year1, year1Sev, year2, year2to3)
 
 
 # the paper defines A history of vascular disease was defined as stroke, transient ischemic attack, or peripheral arterial disease.
@@ -69,7 +71,7 @@ eclipse <- eclipse.raw %>% filter (fev1<85) %>%  # removing non-copd controls
                         #  filter(packyears > 0) %>%
                           mutate(Observed_Exac_in2to3 = ifelse(year2to3>0, 1, 0))  %>%
                           mutate(Observed_Exac_in2 = ifelse(year2>0, 1, 0))  %>%
-                          mutate(year1FreqExacerbator = ifelse(year1>1, 1, 0),
+                          mutate(year1FreqExacerbator = ifelse(((year1>1) | (year1Sev>0)), 1, 0),
                                  year1HadExac = ifelse(year1>0, 1, 0),
                                  predictedBertens = 
                                    bertens(exacerbationHx = year1HadExac, 
