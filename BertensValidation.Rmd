@@ -3,8 +3,8 @@ title: "Bertens Validation"
 author: "Amin Adibi"
 date: "23/03/2021"
 output:
-  html_document: default
   pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
