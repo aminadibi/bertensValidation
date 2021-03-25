@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Validation
 
-```{r dataprep, echo=FALSE, message =FALSE, warning=FALSE}
+```{r dataprep, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(bertens)
 library(pROC)
@@ -118,9 +118,9 @@ plot_decision_curve(list(dc_bertens_2yrs, dc_history_2yrs),
 
 ```
 
-### Two years - Smokers
+<!-- ### Two years - Smokers -->
 
-```{r ROCTwoSmokers, echo=FALSE}
+```{r ROCTwoSmokers, echo=FALSE, include=FALSE}
 
 ## smokers - 2 years
 BertensROCSmokers2Yrs <- roc(predictor=eclipseCompleteSmokers$predictedBertens, response = eclipseCompleteSmokers$Observed_Exac_in2to3,
@@ -148,9 +148,9 @@ plot_decision_curve(list(dc_bertens_2yrsSmokers, dc_history_2yrsSmokers),
 ##
 ```
 
-<!-- ### One year predicitons -->
+### One year predicitons 
 
-```{r ROCOne, echo=FALSE, cache=TRUE, include=FALSE}
+```{r ROCOne, echo=FALSE, cache=TRUE, include=TRUE}
 
 # for 1 year prediction
 roc(predictor=eclipseComplete$predictedBertens1Yr, response = eclipseComplete$Observed_Exac_in2,
@@ -173,16 +173,35 @@ dc_bertens_1yr <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data =
 dc_history_1yr <- decision_curve(Observed_Exac_in2 ~ year1FreqExacerbator, data = eclipseComplete)
 plot_decision_curve(list(dc_bertens_1yr, dc_history_1yr),
                     curve.names = c("Bertens 1Yr", "Exacerbation History"),
+                    standardize = FALSE,
                     confidence.intervals = FALSE,  #remove confidence intervals
                     cost.benefit.axis = FALSE) #remove cost benefit axis)
 
-# one year Smokers
-dc_bertens_1yrSmokers <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data = eclipseCompleteSmokers)
-dc_history_1yrSmokers <- decision_curve(Observed_Exac_in2 ~ year1FreqExacerbator, data = eclipseCompleteSmokers)
-plot_decision_curve(list(dc_bertens_1yrSmokers, dc_history_1yrSmokers),
-                    curve.names = c("Bertens 1Yr Smokers", "Exacerbation History Smokers"),
-                    confidence.intervals = FALSE,  #remove confidence intervals
-                    cost.benefit.axis = FALSE) #remove cost benefit axis)
+# # one year Smokers
+# dc_bertens_1yrSmokers <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data = eclipseCompleteSmokers)
+# dc_history_1yrSmokers <- decision_curve(Observed_Exac_in2 ~ year1FreqExacerbator, data = eclipseCompleteSmokers)
+# plot_decision_curve(list(dc_bertens_1yrSmokers, dc_history_1yrSmokers),
+#                     curve.names = c("Bertens 1Yr Smokers", "Exacerbation History Smokers"),
+#                     confidence.intervals = FALSE,  #remove confidence intervals
+#                     cost.benefit.axis = FALSE) #remove cost benefit axis)
+```
+
+```{r NumbersforManuscript, echo=FALSE, cache=TRUE, include=TRUE}
+
+dc_bertens_data <- as_tibble (dc_bertens_1yr$derived.data) %>%
+  mutate (NB_Bertens = NB) %>% select(thresholds, NB_Bertens)
+
+dc_history_data <- as_tibble (dc_history_1yr$derived.data) %>%
+  mutate (NB_history = NB) %>% select(thresholds, NB_history)
+
+dc_data <- dc_bertens_data %>% inner_join(dc_history_data, by = "thresholds")
+
+Calc <- eclipseComplete %>%
+  mutate(BertensWillHaveExac = ifelse(predictedBertens1Yr>=0.25, 1, 0),
+                           truePos = ((BertensWillHaveExac == 1) & (Observed_Exac_in2==1)),
+                           falsePos = ((BertensWillHaveExac == 1) & (Observed_Exac_in2==0)))
+Calc %>% summarise(count = sum(truePos)/n())
+Calc %>% summarise(count = sum(falsePos)/n())
 
 
 ```
@@ -256,6 +275,11 @@ plot_decision_curve(list(dc_accept, dc_history_accept),
                     cost.benefit.axis = FALSE) #remove cost benefit axis)
 
 
+# Comparing ACCEPT vs 1 Year Bertens and History
+plot_decision_curve(list(dc_accept, dc_history_1yr, dc_bertens_1yr),
+                    curve.names = c("ACCEPT", "Exacerbation History ", "Bertens"),
+                    confidence.intervals = FALSE,  #remove confidence intervals
+                    cost.benefit.axis = FALSE) #remove cost benefit axis))
 
 # 
 # externalResults$hadExac2 <-ifelse(externalResults$observedExacCount>1, 1, 0)
