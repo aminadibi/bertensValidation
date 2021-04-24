@@ -19,13 +19,11 @@ affiliation:
   - num: b
     address: |
       Division of Respiratory Medicine, Department of Medicine, The UBC Centre for Heart Lung Innovation, St. Paul's Hospital, University of British Columbia, Vancouver, BC, Canada
-bibliography: interactcadsample.bib
+bibliography: RESP.bib
 appendix: appendix.tex
 abstract: |
-  This template is for authors who are preparing a manuscript for a Taylor & 
-  Francis journal using the \LaTeX\ document preparation system and the 
-  `interact} class file, which is available via selected journals' home 
-  pages on the Taylor & Francis website.
+  We are reporting an independent validation of the COPD exacerbation prediction model
+  developed by Bertens and colleagues in the 
 keywords: |
   COPD; prediction; validation
 header-includes: |
@@ -37,68 +35,29 @@ output: rticles::tf_article
 
 # Introduction
 
-In order to assist authors in the process of preparing a manuscript for a journal, the Taylor & Francis '\textsf{Interact}' layout style has been implemented as a \LaTeXe\ class file based on the `article` document class. A \textsc{Bib}\TeX\ bibliography style file and a sample bibliography are also provided in order to assist with the formatting of your references.
+The Berten's model [@bertens_development_2013].
 
-Commands that differ from or are provided in addition to standard \LaTeXe\ are described in this document, which is _not_ a substitute for a \LaTeXe\ tutorial.
 
-The `interactcadsample.tex` file can be used as a template for a manuscript by cutting, pasting, inserting and deleting text as appropriate, using the preamble and the \LaTeX\ environments provided (e.g.\ `\begin{abstract}`, `\begin{keywords}`).
 
-## The \textsf{Interact} class file
+# Methods
 
-The `interact` class file preserves the standard \LaTeXe\ interface such that any document that can be produced using `article.cls` can also be produced with minimal alteration using the `interact` class file as described in this document.
+We have followed recommendations of the Transparent Reporting of a Multivariable Prediction Model for Individual Prognosis or Diagnosis (the TRIPOD Statement) [@collins_transparent_2015] in reporting our independent validation of the Bertens model. External validation was done using three years of data from COPD patients enrolled in the Evaluation of COPD Longitudinally to Identify Predictive Surrogate End-points (the ECLIPSE Study), an independent non-interventional observational longitudinal COPD cohort study that was aimed at characterizing progression of the disease[@agusti_characterisation_2010].
 
-If your article is accepted for publication it will be typeset as the journal requires in Minion Pro and/or Myriad Pro. Since most authors will not have these fonts installed, the page make-up is liable to alter slightly with the change of font. Also, the `interact` class file produces only single-column format, which is preferred for peer review and will be converted to two-column format by the typesetter if necessary during preparation of the proofs. Please therefore do not try to match the typeset format exactly, but use the standard \LaTeX\ fonts instead and ignore details such as slightly long lines of text or figures/tables not appearing in exact synchronization with their citations in the text: these details will be dealt with by the typesetter. Similarly, it is unnecessary to spend time addressing warnings in the log file -- if your .tex file compiles to produce a PDF document that correctly shows how you wish your paper to appear, such warnings will not prevent your source files being imported into the typesetter's program.
+The first year of the ECLIPSE study was used to establish exacerbation history, year two was used to assess validity of one-year and two-year predictions were assessed using data from year two, and years 2-3, respectively. 
 
-## Submission of manuscripts prepared using _\LaTeX_
+We report external validation of the model in terms of calibration (the degree to which predicted and observed risk of exacerbations are in agreement), discrimination (the extend to which the model is able to separate higher and lower risk individuals), and clinical utility (net benefit across different risk thresholds for treatment decision). 
 
-Manuscripts for possible publication should be submitted to the Editors for review as directed in the journal's Instructions for Authors, and in accordance with any technical instructions provided in the journal's ScholarOne Manuscripts or Editorial Manager site. Your \LaTeX\ source file(s), the class file and any graphics files will be required in addition to the final PDF version when final, revised versions of accepted manuscripts are submitted.
+Calibration was assessed through visual examination of the calibration curve. Differentiation was assessed by plotting the Receiver Operating Characteristic (ROC) curve and its area-under-the-curve (AUC), also known as the c-statistic. Clinical utility was assesses through have reported Decision Curve Analysis [@vickers_simple_2019]. 
 
-Please ensure that any author-defined macros used in your article are gathered together in the preamble of your .tex file, i.e.\ before the `\begin{document}` command. Note that if serious problems are encountered in the coding of a document (missing author-defined macros, for example), the typesetter may resort to rekeying it.
 
-# Using the `interact` class file
-
-For convenience, simply copy the `interact.cls` file into the same directory as your manuscript files (you do not need to install it in your \TeX\ distribution). In order to use the `interact` document class, replace the command `\documentclass{article}` at the beginning of your document with the command `\documentclass{interact}`.
-
-The following document-class options should _not_ be used with the `interact` class file:
-
-* `10pt`, `11pt`, `12pt` -- unavailable;
-* `oneside`, `twoside` -- not necessary, `oneside` is the default;
-* `leqno`, `titlepage` -- should not be used;
-* `twocolumn` -- should not be used (see Subsection~\ref{class});
-* `onecolumn` -- not necessary as it is the default style.
-
-To prepare a manuscript for a journal that is printed in A4 (two column) format, use the `largeformat` document-class option provided by `interact.cls`; otherwise the class file produces pages sized for B5 (single column) format by default. The `geometry` package should not be used to make any further adjustments to the page dimensions.
-
+The study was approved by the University of British Columbia and Providence Health Research Ethics Board (H11–00786).
 <!-- If your manuscript has supplementary content you can prepare this using the `suppldata` document-class option, which will suppress the `article history' date. This option must _not_ be used on any primary content. -->
 
-# Additional features of the `interact` class file
-
-## Title, authors' names and affiliations, abstracts and article types
-
-## Abbreviations
-
-A list of abbreviations may be included if required, enclosed within an `abbreviations` environment, i.e.\ `\begin{abbreviations}`\ldots`\end{abbreviations}`, immediately following the `abstract` environment.
+# Results
 
 
-## Keywords
+# Discsussions
 
-A list of keywords may be included if required, enclosed within a `keywords` environment, i.e.\ `\begin{keywords}`\ldots`\end{keywords}`. Additional keywords in other languages (preceded by a translation of the word `keywords`) may also be included within the `keywords` environment if required.
-
-
-## Subject classification codes
-
-AMS, JEL or PACS classification codes may be included if required. The `interact` class file provides an `amscode` environment, i.e.\ `\begin{amscode}`\ldots`\end{amscode}`, a `jelcode` environment, i.e.\ `\begin{jelcode}`\ldots`\end{jelcode}`, and a `pacscode` environment, i.e.\ `\begin{pacscode}`\ldots`\end{pacscode}` to assist with this.
-
-
-## Additional footnotes to the title or authors' names
-
-<!-- The `\thanks` command may be used to create additional footnotes to the title or authors' names if required. Footnote symbols for this purpose should be used in the order -->
-<!-- $^\ast$~(coded as `$^\ast$`), $\dagger$~(`$\dagger$`), $\ddagger$~(`$\ddagger$`), $\S$~(`$\S$`), $\P$~(`$\P$`), $\|$~(`$\|$`), -->
-<!-- $\dagger\dagger$~(`$\dagger\dagger$`), $\ddagger\ddagger$~(`$\ddagger\ddagger$`), $\S\S$~(`$\S\S$`), $\P\P$~(`$\P\P$`). -->
-
-Note that any `footnote`s to the main text will automatically be assigned the superscript symbols 1, 2, 3, etc. by the class file.^[If preferred, the `endnotes` package may be used to set the notes at the end of your text, before the bibliography. The symbols will be changed to match the style of the journal if necessary by the typesetter.]
-
-# Embedding R code
 
 ## Code chunks
 
@@ -326,85 +285,6 @@ Please note that if the `endfloat` package is used, one or both of the commands
 \DeclareDelayedFloatFlavor{sidewaystable}{table}
 ```
 will need to be included in the preamble of your .tex file, after the `endfloat` package is loaded, in order to process any landscape figures and/or tables correctly.
-
-
-## Theorem-like structures
-
-A predefined `proof` environment is provided by the `amsthm` package (which is called by the `interact` class file), as follows:
-\begin{proof}
-More recent algorithms for solving the semidefinite programming relaxation are particularly efficient, because they explore the structure of the MAX-CUT problem.
-\end{proof}
-\noindent This was produced by simply typing:
-```
-\begin{proof}
-More recent algorithms for solving the semidefinite programming
-relaxation are particularly efficient, because they explore the
-structure of the MAX-CUT problem.
-\end{proof}
-```
-Other theorem-like environments (theorem, definition, remark, etc.) need to be defined as required, e.g.\ using `\newtheorem{theorem}{Theorem}` in the preamble of your .tex file (see the preamble of `interactcadsample.tex` for more examples). You can define the numbering scheme for these structures however suits your article best. Please note that the format of the text in these environments may be changed if necessary to match the style of individual journals by the typesetter during preparation of the proofs.
-
-
-## Mathematics
-
-### Displayed mathematics
-
-The `interact` class file will set displayed mathematical formulas centred on the page without equation numbers if you use the `displaymath` environment or the equivalent `\[...\]` construction. For example, the equation
-\[
- \hat{\theta}_{w_i} = \hat{\theta}(s(t,\mathcal{U}_{w_i}))
-\]
-was typeset using the commands
-```
-\[
- \hat{\theta}_{w_i} = \hat{\theta}(s(t,\mathcal{U}_{w_i}))
-\]
-```
-
-For those of your equations that you wish to be automatically numbered sequentially throughout the text for future reference, use the `equation` environment, e.g.
-\begin{equation}
- \hat{\theta}_{w_i} = \hat{\theta}(s(t,\mathcal{U}_{w_i}))
-\end{equation}
-was typeset using the commands
-```
-\begin{equation}
- \hat{\theta}_{w_i} = \hat{\theta}(s(t,\mathcal{U}_{w_i}))
-\end{equation}
-```
-
-Part numbers for sets of equations may be generated using the `subequations` environment, e.g.
-\begin{subequations} \label{subeqnexample}
-\begin{equation}
-     \varepsilon \rho w_{tt}(s,t) = N[w_{s}(s,t),w_{st}(s,t)]_{s},
-     \label{subeqnparta}
-\end{equation}
-\begin{equation}
-     w_{tt}(1,t)+N[w_{s}(1,t),w_{st}(1,t)] = 0,
-     \label{subeqnpartb}
-\end{equation}
-\end{subequations}
-which was typeset using the commands
-```
-\begin{subequations} \label{subeqnexample}
-\begin{equation}
-     \varepsilon \rho w_{tt}(s,t) = N[w_{s}(s,t),w_{st}(s,t)]_{s},
-     \label{subeqnparta}
-\end{equation}
-\begin{equation}
-     w_{tt}(1,t)+N[w_{s}(1,t),w_{st}(1,t)] = 0,   \label{subeqnpartb}
-\end{equation}
-\end{subequations}
-```
-<!-- This is made possible by the `amsmath` package, which is called by the class file. If you put a `\label` just after the `\begin{subequations}` command, references can be made to the collection of equations, i.e.\ `(\ref{subeqnexample})' in the example above. Or, as the example also shows, you can label and refer to each equation individually -- i.e.\ `(\ref{subeqnparta})' and `(\ref{subeqnpartb})'. -->
-
-Displayed mathematics should be given end-of-line punctuation appropriate to the running text sentence of which it forms a part, if required.
-
-### Math fonts
-
-#### Superscripts and subscripts
-Superscripts and subscripts will automatically come out in the correct size in a math environment (i.e.\ enclosed within `\(...\)` or `$...$` commands in running text, or within `\[...\]` or the `equation` environment for displayed equations). Sub/superscripts that are physical variables should be italic, whereas those that are labels should be roman (e.g.\ $C_p$, $T_\mathrm{eff}$). If the subscripts or superscripts need to be other than italic, they must be coded individually.
-
-#### Upright Greek characters and the upright partial derivative sign
-Upright lowercase Greek characters can be obtained by inserting the letter `u` in the control code for the character, e.g.\ `\umu` and `\upi` produce $\umu$ (used, for example, in the symbol for the unit microns -- $\umu\mathrm{m}$) and $\upi$ (the ratio of the circumference of a circle to its diameter). Similarly, the control code for the upright partial derivative $\upartial$ is `\upartial`. Bold lowercase as well as uppercase Greek characters can be obtained by `{\bm \gamma}`, for example, which gives ${\bm \gamma}$, and `{\bm \Gamma}`, which gives ${\bm \Gamma}$.
 
 
 # Acknowledgement(s) {-}

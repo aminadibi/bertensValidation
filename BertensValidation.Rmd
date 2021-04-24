@@ -87,6 +87,7 @@ eclipseCompleteSmokers <- eclipseComplete %>% filter (packyears>=1)
 write.csv(eclipse, "eclipse_bertens.csv")
 
 ```
+
 ### Missing Values
 ```{r missingData, echo=FALSE}
 #missing data
@@ -94,6 +95,134 @@ eclipse %>% gg_miss_fct(fct = sex) + xlab ("") + ylab("") + theme(legend.positio
 
 eclipseComplete %>% head()
 ```
+<!-- ### Data Summary -->
+<!-- ```{r dataSummary, echo=FALSE} -->
+
+<!-- ggplot_density <- function(dataset, group, VarName, Height = px(50), PaletteName = "Set1") { -->
+<!-- # force(VarName) -->
+<!--   if (is.null(group)) { -->
+<!--     gg_object <- ggplot(data = dataset, aes(x = !!sym(VarName), fill = 1)) + -->
+<!--       geom_density(alpha = 0.4) + -->
+<!--       scale_fill_brewer(palette = PaletteName) + -->
+<!--       theme_classic() + -->
+<!--       scale_x_continuous(breaks = breaks_pretty(3)) + -->
+<!--       theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), -->
+<!--             axis.line.y = element_blank(), text = element_text(size = 80), legend.position="none") -->
+<!--   } -->
+<!--   else { -->
+<!--     gg_object <- ggplot(data = dataset, aes(x = !!sym(VarName), fill = !!sym(group))) + -->
+<!--       geom_density(alpha = 0.4) + -->
+<!--       scale_fill_brewer(palette = PaletteName) + -->
+<!--       # scale_fill_manual(values = color_list) + -->
+<!--       theme_classic() + -->
+<!--       scale_x_continuous(breaks = breaks_pretty(3)) + -->
+<!--       theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), -->
+<!--             axis.line.y = element_blank(), text = element_text(size = 80), legend.position="none") -->
+<!--   } -->
+<!--   gg_object %>% ggplot_image(height = Height) -->
+<!-- } -->
+
+
+<!-- ggplot_bar <- function(dataset, group, VarName, Height = px(50), PaletteName = "Set1") { -->
+<!--   if (is.null(group)) { -->
+<!--     gg_object = ggplot(data = dataset, aes(x = !!sym(VarName), fill = 1)) + -->
+<!--       geom_bar(stat = "count", width = 0.5, position = position_dodge(width = 0.9)) + -->
+<!--       scale_fill_brewer(palette = PaletteName) + -->
+<!--       theme_classic() + -->
+<!--       theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), -->
+<!--             axis.line.y = element_blank(), text = element_text(size = 65), legend.position="none") -->
+<!--   } -->
+<!--   else { -->
+<!--     gg_object = ggplot(data = dataset, aes(x = !!sym(VarName), fill = !!sym(group))) + -->
+<!--       geom_bar(stat = "count", width = 0.5, position = position_dodge(width = 0.9)) + -->
+<!--       scale_fill_brewer(palette = "Set1") + -->
+<!--       # scale_fill_manual(values = color_list) + -->
+<!--       theme_classic() + -->
+<!--       theme(axis.title = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), -->
+<!--             axis.line.y = element_blank(), text = element_text(size = 65), legend.position="none") -->
+<!--   } -->
+<!--   gg_object %>% ggplot_image(height = Height) -->
+<!-- } -->
+
+<!-- ## Covariates summary statistics -->
+<!-- n_decimal <- 1 -->
+<!-- n_group <- length(table(eclipseComplete[ , "group"])) -->
+<!-- # color_list <- c("#4285F4", "#EA4335", "#34A853", "#FBBC05", "purple")[c(1 : n_group)] -->
+<!-- ContVarList <- c("Age", "fev1", "packyears", "SGRQ") -->
+<!-- OutcVarList <- c("year2to3") -->
+<!-- CatVarList <- c("sex", "year1HadExac", "vascularDx") -->
+<!-- col_names <- names(table(eclipseComplete[ , "group"])) -->
+<!-- eclipseComplete %>% -->
+<!--   group_by(group) %>% -->
+<!--   summarise(n = n(), -->
+<!--             Predictors = "Mean (SD)", -->
+<!--             `Age (year)` = paste0(round(mean(`Age (year)`), digits = n_decimal), -->
+<!--                                   " (", round(sd(`Age (year)`), digits = n_decimal), ")"), -->
+<!--             `FEV1 % Predicted` = paste0(round(mean(`FEV1 % Predicted`), digits = n_decimal), -->
+<!--                                         " (", round(sd(`FEV1 % Predicted`), digits = n_decimal), ")"), -->
+<!--             `BMI` = paste0(round(mean(`BMI`), digits = n_decimal), -->
+<!--                            " (", round(sd(`BMI`), digits = n_decimal), ")"), -->
+<!--             `SGRQ` = paste0(round(mean(`SGRQ`, na.rm = T), digits = n_decimal), -->
+<!--                             " (", round(sd(`SGRQ`, na.rm = T), digits = n_decimal), ")"), -->
+<!--             temp1 = "Count (%)", -->
+<!--             `Sex (male)` = paste0(sum(`Sex (male)` == "Male"), -->
+<!--                                   " (", round(100 * mean(`Sex (male)` == "Male"), digits = n_decimal), "%)"), -->
+<!--             `Current smoker` = paste0(sum(`Current smoker` == "Yes"), -->
+<!--                                       " (", round(100 * mean(`Current smoker` == "Yes"), digits = n_decimal), "%)"), -->
+<!--             `On statin` = paste0(sum(`On statin` == "Yes"), -->
+<!--                                  " (", round(100 * mean(`On statin` == "Yes"), digits = n_decimal), "%)"), -->
+<!--             `O2 therapy` = paste0(sum(`O2 therapy` == "Yes"), -->
+<!--                                   " (", round(100 * mean(`O2 therapy` == "Yes"), digits = n_decimal), "%)"), -->
+<!--             `On LAMA` = paste0(sum(`On LAMA` == "Yes"), -->
+<!--                                " (", round(100 * mean(`On LAMA` == "Yes"), digits = n_decimal), "%)"), -->
+<!--             `On LABA` = paste0(sum(`On LABA` == "Yes"), -->
+<!--                                " (", round(100 * mean(`On LABA` == "Yes"), digits = n_decimal), "%)"), -->
+<!--             `On ICS` = paste0(sum(`On ICS` == "Yes"), -->
+<!--                               " (", round(100 * mean(`On ICS` == "Yes"), digits = n_decimal), "%)"), -->
+<!--             Outcomes = "Count (Rate)", -->
+<!--             `Follow-up time (year)` = paste0(round(mean(YIS), digits = 2), -->
+<!--                                              " (", round(sd(YIS), digits = n_decimal), ")"), -->
+<!--             `All exacerbations` = paste0(sum(obsExac), -->
+<!--                                                        " (", round(sum(obsExac) / sum(YIS), digits = 2), ")"), -->
+<!--             `Severe exacerbations` = paste0(sum(obsExac_Sev), -->
+<!--                                                        " (", round(sum(obsExac_Sev) / sum(YIS), digits = 2), ")")) -> DataSummary_temp -->
+<!-- DataSummary_temp_t <- t(DataSummary_temp[ , -1]) -->
+<!-- colnames(DataSummary_temp_t) <- levels(as.data.frame(DataSummary_temp)[ , 1]) -->
+<!-- DataSummary <- as.data.frame(DataSummary_temp_t) -->
+<!-- DataSummary[c("Predictors", "temp1", "Outcomes") , c("Development Sample", "TORCH")] <- "" -->
+<!-- rownames(DataSummary)[grep("temp", rownames(DataSummary))] <- c("") -->
+<!-- DataSummary$Distribution <- NA -->
+<!-- ContVarList_gg <- NULL -->
+<!-- for (varTemp in ContVarList) { -->
+<!--   ContVarList_gg <- c(ContVarList_gg, -->
+<!--                       ggplot_density(dataset = AllTrials_Data_Table1_temp, group = "group", VarName = varTemp, -->
+<!--                                      Height = px(50))) -->
+<!-- } -->
+<!-- OutcVarList_gg <- NULL -->
+<!-- for (varTemp in OutcVarList) { -->
+<!--   OutcVarList_gg <- c(OutcVarList_gg, -->
+<!--                       ggplot_density(dataset = AllTrials_Data_Table1_temp, group = "group", VarName = varTemp, -->
+<!--                                      Height = px(50))) -->
+<!-- } -->
+<!-- CatVarList_gg <- NULL -->
+<!-- for (varTemp in CatVarList) { -->
+<!--   CatVarList_gg <- c(CatVarList_gg, -->
+<!--                      ggplot_bar(dataset = AllTrials_Data_Table1_temp, group = "group", VarName = varTemp, -->
+<!--                                 Height = px(50))) -->
+<!-- } -->
+<!-- dplyr::tibble(` ` = rownames(DataSummary), DataSummary) %>% -->
+<!--   gt() %>% -->
+<!--   text_transform(locations = cells_body(columns = vars("Distribution"), rows = ! rownames(DataSummary) %in% c("n", "Predictors", "Outcomes", "")), -->
+<!--                  fn = function(x) c(ContVarList_gg, CatVarList_gg, OutcVarList_gg)) %>% -->
+<!--   tab_style(locations = cells_body(vars(!!sym(col_names[1])), rows = ! rownames(DataSummary) %in% c("Predictors", "Outcomes", "")), style = cell_text(color = ggplot2::scale_colour_brewer(palette = "Set1")$palette(9)[1])) %>% -->
+<!--   # tab_style(locations = cells_body(vars(!!sym(col_names[1])), rows = ! rownames(DataSummary) %in% c("Predictors", "Outcomes", "")), style = cell_text(color = color_list[1])) %>% -->
+<!--   tab_style(locations = cells_body(vars(!!sym(col_names[2])), rows = ! rownames(DataSummary) %in% c("Predictors", "Outcomes", "")), style = cell_text(color = ggplot2::scale_colour_brewer(palette = "Set1")$palette(9)[2])) %>% -->
+<!--   tab_style(locations = cells_body(vars(!!sym(col_names[3])), rows = ! rownames(DataSummary) %in% c("Predictors", "Outcomes", "")), style = cell_text(color = ggplot2::scale_colour_brewer(palette = "Set1")$palette(9)[3])) %>% -->
+<!--   fmt_missing(columns = vars("Distribution"), missing_text = "") -> gt_Fnl -->
+
+<!-- gt_Fnl -->
+
+<!-- ``` -->
 
 ### Two years, Bertens vs History - all COPD
 ```{r ROCTwo, echo=FALSE}
@@ -139,7 +268,7 @@ ggroc (Rocs, size = 1)  + theme_bw(base_size = 14) +
 calibrate.plot(y = eclipseCompleteSmokers$Observed_Exac_in2to3, p = eclipseCompleteSmokers$predictedBertens)
 
 
-dc_bertens_2yrsSmokers <- decision_curve(Observed_Exac_in2to3 ~ predictedBertens, data = eclipseCompleteSmokers)
+dc_bertens_2yrsSmokers <- decision_curve(Observed_Exac_in2to3 ~ predictedBertens, data = eclipseCompleteSmokers, fi)
 dc_history_2yrsSmokers <- decision_curve(Observed_Exac_in2to3 ~ year1FreqExacerbator, data = eclipseCompleteSmokers)
 plot_decision_curve(list(dc_bertens_2yrsSmokers, dc_history_2yrsSmokers),
                     curve.names = c("Bertens Model Smokers", "Exacerbation History Smokers"),
@@ -169,7 +298,25 @@ roc(predictor=eclipseComplete$year1FreqExacerbator, response = eclipseComplete$O
 # for one year outcome
 calibrate.plot(y = eclipseComplete$Observed_Exac_in2, p = eclipseComplete$predictedBertens1Yr)
 
-dc_bertens_1yr <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data = eclipseComplete)
+# net_benefit <- function (data, response, predictor, threshold) {
+#   
+# Calc <- eclipseComplete %>%
+# mutate(predictedOutcome = ifelse(predictor>=threshold, 1, 0),
+#                            truePos = ((predictedOutcome == 1) & (response==1)),
+#                            falsePos = ((predictedOutcome == 1) & (response==0)))
+# TPR <- Calc %>% summarise(count = sum(truePos)/n())
+# message(TPR)
+# FPR <- Calc %>% summarise(count = sum(falsePos)/n())
+# message(FPR)
+# 
+# nb <- TPR - FPR * (threshold/(1-threshold))
+# 
+# return (nb)
+# }
+# 
+# net_benefit(eclipseComplete, Observed_Exac_in2, predictedBertens1Yr, 0.40)
+
+dc_bertens_1yr <- decision_curve(Observed_Exac_in2 ~ predictedBertens1Yr, data = eclipseComplete, fitted.risk = TRUE)
 dc_history_1yr <- decision_curve(Observed_Exac_in2 ~ year1FreqExacerbator, data = eclipseComplete)
 plot_decision_curve(list(dc_bertens_1yr, dc_history_1yr),
                     curve.names = c("Bertens 1Yr", "Exacerbation History"),
@@ -197,7 +344,7 @@ dc_history_data <- as_tibble (dc_history_1yr$derived.data) %>%
 dc_data <- dc_bertens_data %>% inner_join(dc_history_data, by = "thresholds")
 
 Calc <- eclipseComplete %>%
-  mutate(BertensWillHaveExac = ifelse(predictedBertens1Yr>=0.25, 1, 0),
+  mutate(BertensWillHaveExac = ifelse(predictedBertens1Yr>=0.40, 1, 0),
                            truePos = ((BertensWillHaveExac == 1) & (Observed_Exac_in2==1)),
                            falsePos = ((BertensWillHaveExac == 1) & (Observed_Exac_in2==0)))
 Calc %>% summarise(count = sum(truePos)/n())
@@ -237,7 +384,7 @@ calibrate.plot(y = eclipseACCEPT$hadSevereExac, p = eclipseACCEPT$predicted_seve
 
 
 dc_accept_sev <- decision_curve(hadSevereExac ~ predicted_severe_exac_probability_oldMethod, 
-                                data = eclipseACCEPT)
+                                data = eclipseACCEPT, fitted.risk = TRUE)
 dc_history_accept_sev <- decision_curve(hadSevereExac ~ year1FreqExacerbator, data = eclipseACCEPT)
 plot_decision_curve(list(dc_accept_sev, dc_history_accept_sev),
                     curve.names = c("ACCEPT Severe", "Exacerbation History - Severe"),
@@ -266,12 +413,21 @@ calibrate.plot(y = eclipseACCEPT$hadExac, p = eclipseACCEPT$predicted_exac_proba
 
 
 dc_accept <- decision_curve(hadExac ~ predicted_exac_probability, 
-                            data = eclipseACCEPT)
+                            data = eclipseACCEPT, fitted.risk = TRUE)
+
+
+betterThanAllPoint <- as_tibble (dc_accept$derived.data) %>% 
+  select (thresholds, NB, model) %>%
+  pivot_wider(names_from = model, values_from = NB) %>%
+  mutate(betterThanAll = `hadExac ~ predicted_exac_probability` > All)
+
+
 dc_history_accept <- decision_curve(hadExac ~ year1FreqExacerbator, 
                                     data = eclipseACCEPT)
 plot_decision_curve(list(dc_accept, dc_history_accept),
                     curve.names = c("ACCEPT", "Exacerbation History "),
                     confidence.intervals = FALSE,  #remove confidence intervals
+                    standardize = FALSE,
                     cost.benefit.axis = FALSE) #remove cost benefit axis)
 
 
@@ -295,3 +451,59 @@ plot_decision_curve(list(dc_accept, dc_history_1yr, dc_bertens_1yr),
 ```
 
 
+```{r ACCEPTNumbersforManuscript, echo=FALSE, cache=TRUE, include=TRUE}
+
+dc_accept_data <- as_tibble (dc_accept$derived.data) %>%
+  mutate (NB_Bertens = NB) %>% select(thresholds, NB_Bertens)
+
+dc_history_accept_data <- as_tibble (dc_history_accept$derived.data) %>%
+  mutate (NB_history = NB) %>% select(thresholds, NB_history)
+
+dc_data <- dc_accept_data %>% inner_join(dc_history_accept_data, by = "thresholds")
+
+## 0.4 Threshold
+ACCEPT0.4 <- eclipseACCEPT %>%
+  mutate(ACCEPTWillHaveExac = ifelse(predicted_exac_probability>=0.40, 1, 0),
+         truePos = ((ACCEPTWillHaveExac == 1) & (hadExac==1)),
+         falsePos = ((ACCEPTWillHaveExac == 1) & (hadExac==0)),
+         trueNeg = ((ACCEPTWillHaveExac == 0) & (hadExac==0)),
+         falseNeg = ((ACCEPTWillHaveExac == 0) & (hadExac==1)))
+
+
+## 2 by 2 Table for 0.4
+message("For a threshold of 0.4")
+ACCEPT0.4 %>% select(truePos, falsePos, trueNeg, falseNeg) %>% summarise(TP = sum(truePos),
+                                                                    FP = sum(falsePos),
+                                                                    TN = sum(trueNeg),
+                                                                    FN = sum(falseNeg))
+## TPR and FPR for 0.4
+TPR0.4 <- ACCEPT0.4 %>% summarise(count = sum(truePos)/n())
+message("TPR for 0.4 is ", as.numeric(TPR0.4))
+FPR0.4 <- ACCEPT0.4 %>% summarise(count = sum(falsePos)/n())
+message("FPR for 0.4 is", as.numeric(FPR0.4 ))
+
+
+## 0.2 Threshold
+ACCEPT0.2 <- eclipseACCEPT %>%
+  mutate(ACCEPTWillHaveExac = ifelse(predicted_exac_probability>=0.20, 1, 0),
+         truePos = ((ACCEPTWillHaveExac == 1) & (hadExac==1)),
+         falsePos = ((ACCEPTWillHaveExac == 1) & (hadExac==0)),
+         trueNeg = ((ACCEPTWillHaveExac == 0) & (hadExac==0)),
+         falseNeg = ((ACCEPTWillHaveExac == 0) & (hadExac==1)))
+
+
+## 2 by 2 Table for 0.4
+message("For a threshold of 0.2")
+ACCEPT0.2 %>% select(truePos, falsePos, trueNeg, falseNeg) %>% summarise(TP = sum(truePos),
+                                                                    FP = sum(falsePos),
+                                                                    TN = sum(trueNeg),
+                                                                    FN = sum(falseNeg))
+## TPR and FPR for 0.4
+TPR0.2 <- ACCEPT0.2 %>% summarise(count = sum(truePos)/n())
+message("TPR for 0.2 is ", as.numeric(TPR0.2))
+
+FPR0.2 <- ACCEPT0.2 %>% summarise(count = sum(falsePos)/n())
+message("FPR for 0.2 is ", as.numeric(FPR0.2))
+
+
+```
